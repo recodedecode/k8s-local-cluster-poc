@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vendor
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+  labels:
+    app.kubernetes.io/name: vendor
+    app.kubernetes.io/part-of: vendor
+    app.kubernetes.io/managed-by: kustomize
+    acme.io/domain: vendor
+    acme.io/tier: vendor
+spec:
+  project: vendor
+  destination:
+    name: in-cluster
+    namespace: vendor
+  source:
+    path: vendor
+    repoURL: https://github.com/recodedecode/k8s-local-cluster-poc
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

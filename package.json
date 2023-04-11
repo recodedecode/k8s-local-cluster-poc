@@ -1,0 +1,20 @@
+{
+  "name": "@recodedecode/k8s-local-cluster-poc",
+  "version": "0.1.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "create:cluster": "kind create cluster --name local-poc --config kind-config.yaml --wait 5m",
+    "delete:cluster": "kind delete cluster --name local-poc",
+    "admin:close": "lsof -ti:8080 | xargs kill -9",
+    "admin:open": "node ./scripts/argo-login.mjs",
+    "bootstrap": "node ./scripts/argo-bootstrap.mjs"
+  },
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "dotenv": "^16.0.3",
+    "inquirer": "^9.1.5",
+    "open": "^9.1.0",
+    "ora": "^6.3.0"
+  }
+}

@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vendor-flipt
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '8'
+spec:
+  project: vendor
+  source:
+    chart: flipt
+    repoURL: https://helm.flipt.io
+    targetRevision: 0.11.0
+    helm:
+      releaseName: flipt
+      values: |
+        flipt:
+          extraEnvVars:
+          - name: FLIPT_LOG_LEVEL
+            value: debug
+          - name: FLIPT_DB_PROTOCOL
+            value: 'mysql'
+          - name: FLIPT_DB_HOST
+            value: 'mariadb.mariadb.svc.cluster.local'
+          - name: FLIPT_DB_PORT
+            value: '3306'
+          - name: FLIPT_DB_NAME
+            value: 'flipt'
+          - name: FLIPT_DB_USER
+            value: 'admin'
+          - name: FLIPT_DB_PASSWORD
+            value: secretpassword
+  destination:
+    namespace: flipt
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

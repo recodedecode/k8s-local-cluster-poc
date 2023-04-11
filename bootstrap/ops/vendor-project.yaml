@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ops
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: ops
+    app.kubernetes.io/part-of: ops
+    app.kubernetes.io/managed-by: kustomize
+    acme.io/domain: ops
+    acme.io/tier: k8s
+spec:
+  description: 'Operations'
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  roles: []

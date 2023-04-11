@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: acme-api
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '5'
+spec:
+  project: acme
+  source:
+    path: acme/packages/api/overlays/local
+    repoURL: https://github.com/recodedecode/k8s-local-cluster-poc.git
+    targetRevision: HEAD
+  destination:
+    namespace: acme-api
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

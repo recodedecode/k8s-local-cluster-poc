@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vendor-kafka-ui
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '9'
+spec:
+  project: vendor
+  source:
+    chart: kafka-ui
+    repoURL: https://provectus.github.io/kafka-ui
+    targetRevision: 0.4.3
+    helm:
+      releaseName: kafka-ui
+      values: |
+        envs:
+          config:
+            KAFKA_CLUSTERS_0_NAME: local
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-0.kafka-headless.kafka.svc.cluster.local:9092
+  destination:
+    namespace: kafka
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

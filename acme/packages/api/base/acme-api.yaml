@@ -1,0 +1,118 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: acme-api-config
+data:
+  .env: |
+    LOG_OUTPUT=inline
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: acme
+  labels:
+    app.kubernetes.io/name: acme
+    app.kubernetes.io/part-of: services
+    app.kubernetes.io/managed-by: kustomize
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: /metrics
+    prometheus.io/port: '8080'
+spec:
+  selector:
+    app: acme
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: acme
+  labels:
+    app.kubernetes.io/name: acme
+    app.kubernetes.io/part-of: services
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: acme
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: acme
+        app.kubernetes.io/name: acme
+        app.kubernetes.io/part-of: services
+        app.kubernetes.io/managed-by: kustomize
+      annotations:
+        co.elastic.logs/json.keys_under_root: 'true'
+        co.elastic.logs/json.overwrite_keys: 'true'
+        co.elastic.logs/json.add_error_key: 'true'
+        co.elastic.logs/json.expand_keys: 'true'
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8080'
+    spec:
+      containers:
+        - name: acme
+          image: nginx:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 8080              
+          resources:
+            limits:
+              cpu: 300m
+              memory: 1024M
+            requests:
+              cpu: 100m
+              memory: 100M
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          volumeMounts:
+          - name: env
+            mountPath: /opt/app/.env
+            subPath: .env
+            readOnly: true
+      imagePullSecrets:
+        - name: ghcr-auth
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: env
+        configMap:
+          name: acme-api-config

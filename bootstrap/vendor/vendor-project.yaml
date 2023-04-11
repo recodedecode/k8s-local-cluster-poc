@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: vendor
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: vendor
+    app.kubernetes.io/part-of: vendor
+    app.kubernetes.io/managed-by: kustomize
+    acme.io/domain: vendor
+    acme.io/tier: vendor
+spec:
+  description: 'Operations'
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  roles: []

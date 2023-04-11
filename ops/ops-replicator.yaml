@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ops-replicator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+spec:
+  project: ops
+  source:
+    chart: kubernetes-replicator
+    repoURL: https://helm.mittwald.de
+    targetRevision: 2.7.3
+    helm:
+      releaseName: replicator
+  destination:
+    namespace: replicator
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
