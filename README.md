@@ -1,8 +1,14 @@
+> ***IMPORTANT:** This repo is a Proof of Concept used to demonstrate how a team might have a "quick start" for launching a Kubernetes Argo based cluster locally for development purposes. This does not represent any companies work or contain any sensitive information that is not for demo purposes only.*
+>
+> *It was smashed down rather quickly so there's sure to be gaps.*
+
 # K8s Local Cluster POC
 
-This is the GitOps proof-of-concept repo for a kubernetes application and associated services. Its purpose is to show how a local dev environment can be easily shared and stood up using Kubernetes. It is for demonstration purposes only and the values in here are mocked or fake as well as the company name `acme`.
+This is the GitOps proof-of-concept repo for a kubernetes application and associated services. Its purpose is to show how a local dev environment can be easily shared and stood up using Kubernetes.
 
 The repo has a quickstart `npm run bootstrap` command that will spin up all the necessary services in the required order. It is necessary to have setup the `.env` file and added the appropriate certificates beforehand. We use a bootstrap script because we can't rely soley on Argo to setup the shared dependencies such as Argo itself and the custom certificates used for Sealed Secrets as well as the auth token necessary for setting up the Argo private repository. These steps must happen in order and certain applications must be available before they can be run.
+
+While it's easy enough to replicate applications in a cluster using [vcluster](https://www.vcluster.com/) (or something like) this is for bootstrapping a local cluster from zero to hero.
 
 
 ## Contents
